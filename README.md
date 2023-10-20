@@ -7,7 +7,7 @@ This module is a companion to the [ConfSync](https://github.com/jhuckaby/confsyn
 The easiest way to install ConfSync Satellite is to use one of our precompiled binaries.  It can live anywhere on the filesystem, but the auto-installer will place it into the `/opt/confsync` directory.  Make sure you are `root` (superuser) to install this:
 
 ```sh
-curl -s https://raw.githubusercontent.com/jhuckaby/confsync-satellite/master/bin/install.sh | bash
+curl -s https://raw.githubusercontent.com/jhuckaby/confsync-satellite/main/bin/install.sh | bash
 ```
 
 This will auto-detect your operating system and system architecture, and download and install the appropriate static binary for your server.  The install script also adds ConfSync Satellite to [cron](https://en.wikipedia.org/wiki/Cron), specifically in `/etc/cron.d/confsync-satellite.cron`, which is set to run once per minute.  It also creates a sample configuration file, if one doesn't exist.
@@ -265,7 +265,7 @@ To customize the log columns, include a top-level `log_columns` property in your
 To upgrade ConfSync Satellite, simply re-run the initial auto-install command:
 
 ```sh
-curl -s https://raw.githubusercontent.com/jhuckaby/confsync-satellite/master/bin/install.sh | bash
+curl -s https://raw.githubusercontent.com/jhuckaby/confsync-satellite/main/bin/install.sh | bash
 ```
 
 This will download the latest version and preserve your existing configuration file.
