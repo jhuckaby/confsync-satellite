@@ -30,7 +30,7 @@ fi
 URL="https://github.com/jhuckaby/confsync-satellite/releases/latest/download/confsync-satellite-$OS-$ARCH"
 echo "Downloading: $URL"
 
-mkdir /opt/confsync || exit 1;
+mkdir -p /opt/confsync || exit 1;
 cd /opt/confsync || exit 1;
 curl -L -o /opt/confsync/satellite.bin "$URL" || exit 1;
 chmod 755 /opt/confsync/satellite.bin || exit 1;
