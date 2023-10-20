@@ -10,12 +10,12 @@ ARCH=$(uname -m)
 URL=""
 
 if [[ "$OS" == "Linux" ]]; then
-    OS="linux"
+	OS="linux"
 elif [[ "$OS" == "Darwin" ]]; then
-    OS="macos"
+	OS="macos"
 else
 	echo "Unknown operating system: $OS" >&2
-    exit 1
+	exit 1
 fi
 
 if [[ "$ARCH" == "x86_64" ]]; then
