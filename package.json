@@ -1,0 +1,38 @@
+{
+	"name": "confsync-satellite",
+	"version": "1.0.0",
+	"description": "Automatically deploy config files from confsync.",
+	"author": "Joseph Huckaby <jhuckaby@gmail.com>",
+	"homepage": "https://github.com/jhuckaby/confsync-satellite",
+	"license": "MIT",
+	"main": "satellite.js",
+	"bin": "satellite.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jhuckaby/confsync-satellite"
+	},
+	"bugs": {
+		"url": "https://github.com/jhuckaby/confsync-satellite/issues"
+	},
+	"keywords": [
+		"confsync", "config", "s3"
+	],
+	"scripts": {
+		"package": "mkdir -p dist && pkg --compress GZip ."
+	},
+	"pkg": {
+		"scripts": [ "node_modules/pixl-server-storage/engines/S3.js" ],
+		"targets": [ "node18-linux-x64", "node18-linux-arm64", "node18-macos-x64", "node18-macos-arm64", "node18-win-x64", "node18-win-arm64" ],
+    	"outputPath": "dist"
+	},
+	"dependencies": {
+		"dotenv": "16.3.1",
+		"pixl-cli": "^1.0.16",
+		"pixl-logger": "^2.0.2",
+		"pixl-request": "^2.0.3",
+		"pixl-server-storage": "^3.1.16"
+	},
+	"devDependencies": {
+		"pkg": "5.8.1"
+	}
+}
