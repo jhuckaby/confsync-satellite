@@ -249,7 +249,7 @@ You can also optionally customize the log "columns" that are written out.  By de
 | `date` | This is a human-readable date/time stamp in the format: `YYYY-MM-DD HH:MI:SS` (in the local server timezone). |
 | `hostname` | This is the hostname of the server running ConfSync Satellite. |
 | `pid` | This is the Process ID (PID) of the ConfSync Satellite process running on the server. |
-| `component` | This is the name of the current component, or simply `ConfSync` for generic messages. |
+| `component` | This is the name of the current component, or simply `Satellite` for generic messages. |
 | `code` | This is the error code, transaction code, or debug log level of the message, from `1` to `9`. |
 | `msg` | This is the log message text itself. |
 | `data` | Any additional data that accompanies the message will be in this column, in JSON format. |
