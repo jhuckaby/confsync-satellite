@@ -260,6 +260,8 @@ To customize the log columns, include a top-level `log_columns` property in your
 "log_columns": ["hires_epoch", "date", "hostname", "pid", "component", "code", "msg", "data"]
 ```
 
+The log files are automatically rotated daily, and compressed archives kept for 7 days.  This is automatically configured via the [logrotate](https://linux.die.net/man/8/logrotate) system on Linux.  See the `/etc/logrotate.d/confsync-satellite` file.
+
 # Upgrading
 
 To upgrade ConfSync Satellite, simply re-run the initial auto-install command:
@@ -268,7 +270,7 @@ To upgrade ConfSync Satellite, simply re-run the initial auto-install command:
 curl -s https://raw.githubusercontent.com/jhuckaby/confsync-satellite/main/install.sh | bash
 ```
 
-This will download the latest version and preserve your existing configuration file.
+This will download and install the latest version while preserving your existing configuration file.
 
 If you installed ConfSync Satellite manually, just re-download the static binary and replace the old one with it.
 
