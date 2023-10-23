@@ -67,7 +67,8 @@ if (!fs.existsSync(config_file) || args.install || (args.other && (args.other[0]
 		// allow CLI to override any config option on install
 		var overrides = Tools.copyHashRemoveKeys( args, { debug:1, install:1, other:1, cron:1, user:1 } );
 		for (var key in overrides) {
-			Tools.setPath( config, key, overrides[key] );
+			if (overrides[key] === '_DELETE_') Tools.deletePath( config, key );
+			else Tools.setPath( config, key, overrides[key] );
 		}
 		
 		var raw_config = JSON.stringify( config, null, "\t" );
@@ -107,7 +108,8 @@ if (args.config || (args.other && (args.other[0] == 'config'))) {
 	// modify config via CLI args, save, and exit
 	var overrides = Tools.copyHashRemoveKeys( args, { debug:1, config:1, other:1 } );
 	for (var key in overrides) {
-		Tools.setPath( config, key, overrides[key] );
+		if (overrides[key] === '_DELETE_') Tools.deletePath( config, key );
+		else Tools.setPath( config, key, overrides[key] );
 	}
 	
 	var raw_config = JSON.stringify( config, null, "\t" );
@@ -147,13 +149,15 @@ for (var key in process.env) {
 		else if (value.match(/^\-?\d+$/)) value = parseInt(value);
 		else if (value.match(/^\-?\d+\.\d+$/)) value = parseFloat(value);
 		
-		Tools.setPath(config, path, value);
+		if (value === '_DELETE_') Tools.deletePath(config, path);
+		else Tools.setPath(config, path, value);
 	}
 }
 
 // allow CLI args to override config
 for (var key in args) {
-	Tools.setPath( config, key, args[key] );
+	if (args[key] === '_DELETE_') Tools.deletePath( config, key );
+	else Tools.setPath( config, key, args[key] );
 }
 
 // exit quietly if not enabled
@@ -407,7 +411,8 @@ var app = {
 					if (Tools.isaHash(overrides)) {
 						// apply JSON path overrides
 						for (var key in overrides) {
-							Tools.setPath( item.base, key, overrides[key] );
+							if (overrides[key] === '_DELETE_') Tools.deletePath( item.base, key );
+							else Tools.setPath( item.base, key, overrides[key] );
 						}
 					}
 					else {
