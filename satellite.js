@@ -267,11 +267,11 @@ var app = {
 			
 			// some sanity checks
 			if (!self.master.groups || !self.master.groups.length) {
-				self.logError('groups', "No target groups defined, exiting.");
+				self.logDebug(5, "No target groups defined, exiting.");
 				return self.shutdown();
 			}
 			if (!self.master.files || !self.master.files.length) {
-				self.logError('files', "No config files defined, exiting.");
+				self.logDebug(5, "No config files defined, exiting.");
 				return self.shutdown();
 			}
 			
@@ -304,7 +304,7 @@ var app = {
 		} );
 		
 		if (!Tools.numKeys(this.groups)) {
-			this.logError('groups', "Server does not match any groups, exiting.");
+			this.logDebug(5, "Server does not match any groups, exiting.");
 			this.shutdown();
 			return false;
 		}
