@@ -268,11 +268,11 @@ var app = {
 			// some sanity checks
 			if (!self.master.groups || !self.master.groups.length) {
 				self.logDebug(5, "No target groups defined, exiting.");
-				return self.shutdown();
+				return self.finish();
 			}
 			if (!self.master.files || !self.master.files.length) {
 				self.logDebug(5, "No config files defined, exiting.");
-				return self.shutdown();
+				return self.finish();
 			}
 			
 			if (!self.detectGroups()) return;
@@ -305,7 +305,7 @@ var app = {
 		
 		if (!Tools.numKeys(this.groups)) {
 			this.logDebug(5, "Server does not match any groups, exiting.");
-			this.shutdown();
+			this.finish();
 			return false;
 		}
 		
