@@ -570,7 +570,7 @@ var app = {
 			var finishSync = function() {
 				// optional upload receipt
 				if (config.upload_receipts && (!config.receipt_uptime_grace_sec || (file.server.uptime > config.receipt_uptime_grace_sec))) {
-					var s3_key = 'reciepts/' + file.id + '/' + file.rev + '/' + file.server.hostname + '-' + Math.floor(now);
+					var s3_key = 'receipts/' + file.id + '/' + file.rev + '/' + file.server.hostname + '-' + Math.floor(now);
 					self.logDebug(9, "Uploading deploy receipt: " + s3_key);
 					self.storage.put( s3_key, file, function(err) {
 						if (err) self.logError('s3', "Failed to upload deploy receipt to S3: " + err);
