@@ -26,7 +26,51 @@ const self_bin = Path.resolve( process.pkg ? process.argv[0] : process.argv[1] )
 const host_hash = Tools.digestHex( os.hostname(), 'sha256' );
 const host_id = parseInt( host_hash.substring(0, 8), 16 ); // 32-bit numerical hash
 
-var SAMPLE_CONFIG = {"enabled":true,"threads":1,"scatter":5,"web_hook":"","allow_shell_exec":false,"temp_dir":"/var/run","log_dir":"/var/log","log_filename":"confsync-satellite.log","log_columns":["hires_epoch","date","hostname","pid","component","category","code","msg","data"],"debug_level":9,"upload_errors":true,"Storage":{"engine":"S3","AWS":{"region":"us-west-1","credentials":{"accessKeyId":"YOUR_AMAZON_ACCESS_KEY","secretAccessKey":"YOUR_AMAZON_SECRET_KEY"},"connectTimeout":5000,"socketTimeout":5000,"maxAttempts":50},"S3":{"keyPrefix":"YOUR_S3_KEY_PREFIX","fileExtensions":true,"params":{"Bucket":"YOUR_S3_BUCKET_ID"}}}};
+var SAMPLE_CONFIG = {
+	"enabled": true,
+	"threads": 1,
+	"scatter": 5,
+	"web_hook": "",
+	"allow_shell_exec": false,
+	"temp_dir": "/var/run",
+	"log_dir": "/var/log",
+	"log_filename": "confsync-satellite.log",
+	"log_columns": [
+		"hires_epoch",
+		"date",
+		"hostname",
+		"pid",
+		"component",
+		"category",
+		"code",
+		"msg",
+		"data"
+	],
+	"debug_level": 9,
+	"upload_errors": true,
+	"upload_receipts": true,
+	"receipt_uptime_grace_sec": 360,
+	"Storage": {
+		"engine": "S3",
+		"AWS": {
+			"region": "us-west-1",
+			"credentials": {
+				"accessKeyId": "YOUR_AMAZON_ACCESS_KEY",
+				"secretAccessKey": "YOUR_AMAZON_SECRET_KEY"
+			},
+			"connectTimeout": 5000,
+			"socketTimeout": 5000,
+			"maxAttempts": 50
+		},
+		"S3": {
+			"keyPrefix": "YOUR_S3_KEY_PREFIX",
+			"fileExtensions": true,
+			"params": {
+				"Bucket": "YOUR_S3_BUCKET_ID"
+			}
+		}
+	}
+};
 
 var config_file = Path.join( Path.dirname( self_bin ), 'config.json' );
 var config = {};
@@ -509,6 +553,28 @@ var app = {
 				else {
 					self.logDebug(5, "PID file does not exist, skipping action: " + file.pid);
 				}
+			}
+			
+			// further augment file object for receipt and web hook payloads
+			file.server = {
+				hostname: os.hostname(),
+				arch: os.arch(),
+				platform: os.platform(),
+				release: os.release(),
+				version: os.version(),
+				load: os.loadavg(),
+				mem: os.totalmem(),
+				uptime: os.uptime()
+			};
+			
+			// optional upload receipt (background)
+			if (config.upload_receipts && (!config.receipt_uptime_grace_sec || (file.server.uptime > config.receipt_uptime_grace_sec))) {
+				var s3_key = 'reciepts/' + file.id + '/' + file.rev + '/' + file.server.hostname + '-' + Math.floor(now);
+				self.logDebug(9, "Uploading deploy receipt: " + s3_key);
+				self.storage.put( s3_key, file, function(err) {
+					if (err) self.logError('s3', "Failed to upload deploy receipt to S3: " + err);
+					else self.logDebug(9, "Deploy receipt uploaded successfully: " + s3_key);
+				} );
 			}
 			
 			// optional web hooks

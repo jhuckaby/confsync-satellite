@@ -57,6 +57,8 @@ ConfSync Satellite expects a JSON formatted configuration file to live in the sa
 	"log_columns": ["hires_epoch", "date", "hostname", "pid", "component", "category", "code", "msg", "data"],
 	"debug_level": 9,
 	"upload_errors": true,
+	"upload_receipts": true,
+	"receipt_uptime_grace_sec": 360,
 	"Storage": {
 		"engine": "S3",
 		"AWS": {
@@ -165,7 +167,17 @@ This is the logging level for debug messages.  `1` is the quietest, and `9` is t
 
 ## upload_errors
 
-Set this to `true` to have ConfSync Satellite automatically upload all errors to a unique S3 key.  The S3 file will be in an `errors/` subdirectory, and be named using the server's hostname.  Using this you can quickly see if any of your servers encountered errors installing your files.
+Set this to `true` to have ConfSync Satellite automatically upload all errors to a unique S3 key.  The S3 file will be in an `errors/` subdirectory, and be named using the server's hostname.  Using this you can quickly see if any of your servers encountered errors installing your files.  It defaults to `true`.
+
+## upload_receipts
+
+Set this to `true` to have ConfSync Satellite automatically upload a "receipt" for each file installation or upgrade.  The receipt is a small JSON document that lives in a special location in S3.  The idea is that ConfSync can display a deployment's progress, or show proof that a file revision was successfully deployed to all servers.  It defaults to `true`.
+
+The receipt files will live in the following S3 location: `receipts/FILE_ID/REVISION/HOSTNAME-TIMESTAMP.json`.  The contents are the same as the [web hook payloads](#web_hook).
+
+## receipt_uptime_grace_sec
+
+To reduce noise in autoscale or edge environments, the uploading of receipt files is skipped unless the server's uptime is beyond a threshold, the default being 6 minutes.  This prevents noise by new servers coming online and performing their first sync.  Adjust this to your liking, or set it to `0` to disable the grace period, and upload all receipts regardless.
 
 ## Storage
 
