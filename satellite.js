@@ -567,15 +567,19 @@ var app = {
 				uptime: os.uptime()
 			};
 			
-			// optional upload receipt (background)
-			if (config.upload_receipts && (!config.receipt_uptime_grace_sec || (file.server.uptime > config.receipt_uptime_grace_sec))) {
-				var s3_key = 'reciepts/' + file.id + '/' + file.rev + '/' + file.server.hostname + '-' + Math.floor(now);
-				self.logDebug(9, "Uploading deploy receipt: " + s3_key);
-				self.storage.put( s3_key, file, function(err) {
-					if (err) self.logError('s3', "Failed to upload deploy receipt to S3: " + err);
-					else self.logDebug(9, "Deploy receipt uploaded successfully: " + s3_key);
-				} );
-			}
+			var finishSync = function() {
+				// optional upload receipt
+				if (config.upload_receipts && (!config.receipt_uptime_grace_sec || (file.server.uptime > config.receipt_uptime_grace_sec))) {
+					var s3_key = 'reciepts/' + file.id + '/' + file.rev + '/' + file.server.hostname + '-' + Math.floor(now);
+					self.logDebug(9, "Uploading deploy receipt: " + s3_key);
+					self.storage.put( s3_key, file, function(err) {
+						if (err) self.logError('s3', "Failed to upload deploy receipt to S3: " + err);
+						else self.logDebug(9, "Deploy receipt uploaded successfully: " + s3_key);
+						callback();
+					} );
+				}
+				else callback();
+			}; // finishSync
 			
 			// optional web hooks
 			if (file.web_hook || config.web_hook) {
@@ -596,9 +600,9 @@ var app = {
 							callback();
 						} );
 					}
-				], callback);
+				], finishSync);
 			}
-			else callback();
+			else finishSync();
 		}); // listFind
 	},
 	
