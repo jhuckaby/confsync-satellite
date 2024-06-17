@@ -1,6 +1,6 @@
 {
 	"name": "confsync-satellite",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"description": "Automatically deploy config files from confsync.",
 	"author": "Joseph Huckaby <jhuckaby@gmail.com>",
 	"homepage": "https://github.com/jhuckaby/confsync-satellite",

@@ -179,6 +179,10 @@ The receipt files will live in the following S3 location: `receipts/FILE_ID/REVI
 
 To reduce noise in autoscale or edge environments, the uploading of receipt files is skipped unless the server's uptime is beyond a threshold, the default being 6 minutes.  This prevents noise by new servers coming online and performing their first sync.  Adjust this to your liking, or set it to `0` to disable the grace period, and upload all receipts regardless.
 
+## fatal
+
+When this property us `true` (which is the default) ConfSync Satellite will emit all errors to STDERR, and exit with a non-zero exit code if any errors occurred.  This is a great way to capture a "failure state" during a critical run such as a bootstrap init startup routine (e.g. as part of autoscale cloud init).
+
 ## Storage
 
 The `Storage` section in the config file is shared with [ConfSync](https://github.com/jhuckaby/confsync), and the values **must** be consistent between the two.  Meaning, however you configured ConfSync for AWS / S3, you should configure these properties in ConfSync Satellite with the same values:

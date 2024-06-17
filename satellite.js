@@ -28,6 +28,7 @@ const host_id = parseInt( host_hash.substring(0, 8), 16 ); // 32-bit numerical h
 
 var SAMPLE_CONFIG = {
 	"enabled": true,
+	"fatal": true,
 	"threads": 1,
 	"scatter": 5,
 	"web_hook": "",
@@ -669,8 +670,8 @@ var app = {
 			if (err) self.logError('s3', "Failed to upload errors to S3: " + err);
 			self.logDebug(9, "Shutdown complete, exiting.");
 			
-			if (args.fatal) {
-				process.stderr.write( payload );
+			if (config.fatal) {
+				process.stderr.write( self.errors.join("") + "\n" );
 				process.exit(1);
 			}
 			else process.exit(0);
