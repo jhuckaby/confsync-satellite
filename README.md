@@ -223,7 +223,8 @@ The ConfSync Satellite binary typically runs headless (via cron), but it also ac
 | `--uninstall` | This deletes everything including the binary executable file. |
 | `--config` | Optionally set custom configuration properties using dot path notation. |
 | `--debug` | Setting this flag runs Satellite in debug mode, causing it to emit the log to the console. |
-| `--quiet` | This silences all output from Satellite, even fatal errors. |
+| `--quiet` | This silences all output from Satellite. |
+| `--fatal` | This will cause all errors to emit to STDERR (even with `--quiet`), and the process will exit with a non-zero code. |
 | `--refresh` | This will cause Satellite to re-download and re-install all config files. |
 
 # Logging

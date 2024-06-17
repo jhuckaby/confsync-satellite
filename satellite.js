@@ -276,26 +276,37 @@ var app = {
 		if (args.refresh) this.state = { serial: "", files: {} };
 		
 		// check serial on S3
-		this.storage.get( 'serial', function(err, data) {
-			if (err) {
-				self.logError('s3', "Failed to load serial: " + err);
-				return self.shutdown();
+		// additional retries here (beyond those offered in pixl-server-storage) due to AWS 
+		// metadata-based auth subsystem (e.g. 169.254.169.254) -- it can randomly fail, 
+		// and it is NOT retried as part of the AWS-SDK retry mechanism.  Since this initial 
+		// request is almost always the one that fails, we wrap this one with retries.
+		// https://github.com/aws/aws-sdk-js-v3/issues/4407
+		
+		async.retry( { times: 5, interval: 1000 }, 
+			function(callback) {
+				self.storage.get( 'serial', callback );
+			},
+			function(err, data) {
+				if (err) {
+					self.logError('s3', "Failed to load serial: " + err);
+					return self.shutdown();
+				}
+				if (data.value == self.state.serial) {
+					self.logDebug(9, "Serial has not changed, exiting.", data);
+					return self.shutdown();
+				}
+				
+				self.logDebug(5, "Serial has changed, performing full sync", {
+					old: self.state.serial,
+					new: data.value
+				});
+				
+				// copy new serial to state object, will save at end
+				self.state.serial = data.value;
+				
+				self.sync();
 			}
-			if (data.value == self.state.serial) {
-				self.logDebug(9, "Serial has not changed, exiting.", data);
-				return self.shutdown();
-			}
-			
-			self.logDebug(5, "Serial has changed, performing full sync", {
-				old: self.state.serial,
-				new: data.value
-			});
-			
-			// copy new serial to state object, will save at end
-			self.state.serial = data.value;
-			
-			self.sync();
-		} );
+		); // async.retry
 	},
 	
 	sync() {
@@ -651,13 +662,18 @@ var app = {
 			return;
 		}
 		
-		var payload = Buffer.from( this.errors.join("\n") + "\n" );
+		var payload = Buffer.from( this.errors.join("") + "\n" );
 		var s3_key = 'errors/' + os.hostname() + '.log';
 		
 		this.storage.put( s3_key, payload, function(err) {
 			if (err) self.logError('s3', "Failed to upload errors to S3: " + err);
 			self.logDebug(9, "Shutdown complete, exiting.");
-			process.exit(0);
+			
+			if (args.fatal) {
+				process.stderr.write( payload );
+				process.exit(1);
+			}
+			else process.exit(0);
 		} );
 	},
 	
