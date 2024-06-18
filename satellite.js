@@ -273,7 +273,10 @@ var app = {
 		this.state_file = Path.join( config.temp_dir, 'confsync-satellite-state.json' );
 		this.state = fs.existsSync(this.state_file) ? Tools.parseJSON( fs.readFileSync(this.state_file, 'utf8') ) : { serial: "FIRST_RUN", files: {} };
 		
-		// optional refresh of all files
+		// if server has no state, set a flag so we can skip over gradual deploys
+		if (this.state.serial == 'FIRST_RUN') args.initial = true;
+		
+		// optional refresh of all files (this also skips over graduals)
 		if (args.refresh) this.state = { serial: "", files: {} };
 		
 		// check serial on S3
@@ -402,7 +405,8 @@ var app = {
 		for (var group_id in this.groups) {
 			if (file.live[group_id]) {
 				// check for gradual roll (duration)
-				if (file.live[group_id].duration) {
+				// only honor this if we're not refreshing, and not doing the initial install
+				if (file.live[group_id].duration && !args.refresh && !args.initial) {
 					var start = file.live[group_id].start;
 					var duration = host_id % file.live[group_id].duration;
 					if (now - start >= duration) {
