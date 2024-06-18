@@ -237,7 +237,7 @@ var app = {
 		
 		// accumulate errors so we can possibly send them up to s3
 		this.logger.on('row', function(line, cols, args) {
-			if (args.category == 'error') self.errors.push(line);
+			if ((args.component == 'Satellite') && (args.category == 'error')) self.errors.push(line);
 		});
 		
 		this.logDebug(5, "ConfSync Satellite v" + pkgInfo.version + " starting run", {
@@ -431,7 +431,7 @@ var app = {
 		
 		if (Tools.numKeys(revs_to_install) > 1) {
 			// conflict!
-			this.logError('conflict', "File conflict warning: Multiple unique revisions target groups we are in (will use: " + rev_to_install + ")", { revs_to_install, file });
+			this.logDebug(2, "File conflict warning: Multiple unique revisions target groups we are in (will use: " + rev_to_install + ")", { revs_to_install, file });
 		}
 		
 		var cur_rev = this.state.files[file.id] || 'n/a';
@@ -445,7 +445,7 @@ var app = {
 		// fetch new revision
 		this.storage.listFind( 'files/' + file.id, { rev: rev_to_install }, function(err, item) {
 			if (err) {
-				self.logError('file', "Could not locate " + file.id + " revision: " + rev_to_install + ": " + err + " (will retry)", file);
+				self.logDebug(2, "Could not locate " + file.id + " revision: " + rev_to_install + ": " + err + " (will retry)", file);
 				
 				// this should never happen, so set flag to keep trying
 				self.state.serial = 'REQUEST_RETRY';
@@ -599,7 +599,7 @@ var app = {
 					function(callback) {
 						if (!file.web_hook) return callback();
 						self.request.json( file.web_hook, file, function(err) {
-							if (err) self.logError('webhook', '' + err);
+							if (err) self.logDebug(6, 'Web hook failed: ' + err);
 							else self.logDebug(9, "Web hook fired successfully: " + file.web_hook);
 							callback();
 						} );
@@ -607,7 +607,7 @@ var app = {
 					function(callback) {
 						if (!config.web_hook) return callback();
 						self.request.json( config.web_hook, file, function(err) {
-							if (err) self.logError('webhook', '' + err);
+							if (err) self.logDebug(6, 'Web hook failed: ' + err);
 							else self.logDebug(9, "Web hook fired successfully: " + config.web_hook);
 							callback();
 						} );
